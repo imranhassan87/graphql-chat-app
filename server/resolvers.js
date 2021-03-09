@@ -18,7 +18,7 @@ const Query = {
 
 const Mutation = {
   addMessage: (_root, {input}, {userId}) => {
-    requireAuth(userId);
+     
     const messageId = db.messages.create({from: userId, text: input.text});
     const message = db.messages.get(messageId);
     pubsub.publish(MESSAGE_ADDED,{messageAdded:message})
@@ -28,7 +28,10 @@ const Mutation = {
 
 const Subscription = {
   messageAdded :{
-    subscribe:() => pubsub.asyncIterator(MESSAGE_ADDED)
+    subscribe:(parent,args,{userId}) => {
+      requireAuth(userId)
+      return pubsub.asyncIterator(MESSAGE_ADDED)
+    }
   }
 }
 
