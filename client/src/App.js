@@ -1,33 +1,35 @@
-import React, { Component } from 'react';
+import React, { useState } from 'react';
+import {ApolloProvider} from '@apollo/react-hooks'
+import client from './graphql/client'
 import { getLoggedInUser, logout } from './auth';
 import Chat from './Chat';
 import Login from './Login';
 import NavBar from './NavBar';
 
-class App extends Component {
-  state = {user: getLoggedInUser()};
+function App (){
+  const [user,setUser] = useState(getLoggedInUser())
+  // state = {user: getLoggedInUser()};
 
-  handleLogin(user) {
-    this.setState({user});
-  }
+  const handleLogin = (user) => setUser(user);
 
-  handleLogout() {
+  const  handleLogout =() => {
     logout();
-    this.setState({user: null});
+    setUser(null);
   }
 
-  render() {
-    const {user} = this.state;
+  
     if (!user) {
-      return <Login onLogin={this.handleLogin.bind(this)} />;
+      return <Login onLogin={handleLogin} />;
     }
     return (
+      <ApolloProvider client={client}>
       <div>
-        <NavBar onLogout={this.handleLogout.bind(this)} />
+        <NavBar onLogout={handleLogout} />
         <Chat user={user} />
       </div>
+      </ApolloProvider>
     );  
   }
-}
+
 
 export default App;
